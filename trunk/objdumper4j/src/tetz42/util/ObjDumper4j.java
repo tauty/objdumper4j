@@ -438,7 +438,7 @@ public class ObjDumper4j {
 		if (obj == null)
 			sb.append("null");
 		else if (obj instanceof CharSequence)
-			sb.append("\"").append((String) obj).append("\"");
+			sb.append("\"").append((CharSequence) obj).append("\"");
 		else if (primitiveMap.containsKey(obj.getClass().getName()))
 			dumpPrimitive(obj, indent);
 		else if (obj.getClass().isArray())
