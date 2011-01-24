@@ -24,11 +24,14 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -74,7 +77,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * &emsp;&emsp;&emsp;&emsp; Logger.debug( dumper(list).superSafe() );<br>
  * <br>
  * 
- * @version 1.0
+ * @version 1.1.0
  * @author tetz
  */
 public class ObjDumper4j {
@@ -128,6 +131,9 @@ public class ObjDumper4j {
 		primitiveMap = Collections.unmodifiableMap(map);
 	}
 
+	private static final String CRLF = System.getProperty("line.separator");
+	private static final String CRLFx2 = CRLF + CRLF;
+
 	/**
 	 * dump method.
 	 * 
@@ -137,7 +143,7 @@ public class ObjDumper4j {
 	 * @return the string converted from objs.
 	 */
 	public static String dump(Object... objs) {
-		return dumper(objs).delimiter("\n\n").toString();
+		return dumper(objs).delimiter(CRLFx2).toString();
 	}
 
 	/**
@@ -229,7 +235,7 @@ public class ObjDumper4j {
 	 * @return the string converted from objs.
 	 */
 	public static String inspect(Object... objs) {
-		return inspecter(objs).delimiter("\n\n").toString();
+		return inspecter(objs).delimiter(CRLFx2).toString();
 	}
 
 	/**
@@ -285,7 +291,7 @@ public class ObjDumper4j {
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j superSafe() {
-		this.m = new SafeMakable() {
+		this.m = new SafeMarkable() {
 
 			@Override
 			protected String genId(Object obj) {
@@ -306,7 +312,7 @@ public class ObjDumper4j {
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j safe() {
-		this.m = new SafeMakable();
+		this.m = new SafeMarkable();
 		return this;
 	}
 
@@ -441,6 +447,10 @@ public class ObjDumper4j {
 			sb.append("\"").append((CharSequence) obj).append("\"");
 		else if (primitiveMap.containsKey(obj.getClass().getName()))
 			dumpPrimitive(obj, indent);
+		else if (obj instanceof Date)
+			dumpDate((Date) obj, indent);
+		else if (obj.getClass().isEnum())
+			sb.append("" + obj);
 		else if (obj.getClass().isArray())
 			dumpAry(obj, indent);
 		else if (obj instanceof Iterable)
@@ -451,6 +461,14 @@ public class ObjDumper4j {
 			dumpThrowable((Throwable) obj);
 		else
 			dumpBean(obj, indent);
+	}
+
+	private SimpleDateFormat sdformat;
+
+	private void dumpDate(Date date, String indent) {
+		if (sdformat == null)
+			sdformat = new SimpleDateFormat("EEE, MMM. d, yyyy 'at' HH:mm:ss.SSS", Locale.US);
+		sb.append(sdformat.format(date));
 	}
 
 	protected void dumpPrimitive(Object obj, String indent) {
@@ -484,10 +502,10 @@ public class ObjDumper4j {
 		}
 		String subIndent = indent + "\t";
 		for (int i = 0; i < length; i++) {
-			sb.append("\n").append(subIndent);
+			sb.append(CRLF).append(subIndent);
 			dumpObj(Array.get(obj, i), subIndent);
 		}
-		sb.append("\n").append(indent).append("]");
+		sb.append(CRLF).append(indent).append("]");
 	}
 
 	protected void dumpIterable(Iterable<?> col, String indent) {
@@ -500,10 +518,10 @@ public class ObjDumper4j {
 		boolean isZero = true;
 		for (Object e : col) {
 			isZero = false;
-			sb.append("\n").append(subIndent);
+			sb.append(CRLF).append(subIndent);
 			dumpObj(e, subIndent);
 		}
-		(isZero ? sb.append(" ") : sb.append("\n").append(indent)).append("]");
+		(isZero ? sb.append(" ") : sb.append(CRLF).append(indent)).append("]");
 	}
 
 	protected void dumpMap(Map<?, ?> map, String indent) {
@@ -518,12 +536,12 @@ public class ObjDumper4j {
 		}
 		String subIndent = indent + "\t";
 		for (Map.Entry<?, ?> e : map.entrySet()) {
-			sb.append("\n").append(subIndent);
+			sb.append(CRLF).append(subIndent);
 			dumpObj(e.getKey(), subIndent);
 			sb.append(": ");
 			dumpObj(e.getValue(), subIndent);
 		}
-		sb.append("\n").append(indent).append("}");
+		sb.append(CRLF).append(indent).append("}");
 	}
 
 	protected void dumpBean(Object obj, String indent) {
@@ -541,7 +559,7 @@ public class ObjDumper4j {
 			String subIndent = indent + "\t";
 			while (true) {
 				for (Field f : clazz.getDeclaredFields()) {
-					sb.append("\n").append(subIndent).append(f.getName())
+					sb.append(CRLF).append(subIndent).append(f.getName())
 							.append(" = ");
 					if (readyForAccess(f, f.getModifiers()))
 						dumpObj(f.get(obj), subIndent);
@@ -549,12 +567,12 @@ public class ObjDumper4j {
 
 				clazz = clazz.getSuperclass();
 				if (clazz != null && clazz != Object.class)
-					sb.append("\n").append(subIndent).append("[")
+					sb.append(CRLF).append(subIndent).append("[")
 							.append(clazz.getName()).append("]");
 				else
 					break;
 			}
-			sb.append("\n").append(indent).append("}");
+			sb.append(CRLF).append(indent).append("}");
 		} catch (Throwable t) {
 			dumpThrowable(t);
 		}
@@ -589,7 +607,7 @@ public class ObjDumper4j {
 		}
 	}
 
-	private class SafeMakable extends Markable {
+	private class SafeMarkable extends Markable {
 		private Map<String, List<Object>> markedListMap = new HashMap<String, List<Object>>();
 
 		private List<Object> getList(Object obj) {
