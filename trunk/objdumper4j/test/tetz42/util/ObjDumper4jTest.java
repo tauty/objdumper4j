@@ -25,13 +25,12 @@ import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-
-import tetz42.util.ObjDumper4j;
 
 public class ObjDumper4jTest {
 
@@ -419,6 +418,20 @@ public class ObjDumper4jTest {
 		System.out.println(sw);
 	}
 
+	@Test
+	public void date() {
+		System.out.println(dumper(new Date()));
+	}
+
+	@Test
+	public void test_enum() {
+		System.out.println(dumper(TestEnum.FOO));
+	}
+
+	enum TestEnum {
+		FOO, BAR, BAZ
+	}
+	
 	@SuppressWarnings("unused")
 	class SampleBean {
 		public int intValue = 10;
