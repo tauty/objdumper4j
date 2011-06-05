@@ -77,7 +77,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * &emsp;&emsp;&emsp;&emsp; Logger.debug( dumper(list).superSafe() );<br>
  * <br>
  * 
- * @version 1.1.0
+ * @version 1.2.0
  * @author tetz
  */
 public class ObjDumper4j {
