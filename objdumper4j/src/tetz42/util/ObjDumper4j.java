@@ -128,8 +128,8 @@ public class ObjDumper4j {
 			prop.load(ObjDumper4j.class
 					.getResourceAsStream("ObjDumper4j.properties"));
 			for (Map.Entry<Object, Object> entry : prop.entrySet())
-				map.put(String.valueOf(entry.getKey()),
-						String.valueOf(entry.getValue()).trim());
+				map.put(String.valueOf(entry.getKey()), String.valueOf(
+						entry.getValue()).trim());
 		} catch (Throwable e) {
 		}
 		primitiveMap = Collections.unmodifiableMap(map);
@@ -587,7 +587,7 @@ public class ObjDumper4j {
 			return;
 		}
 		String subIndent = indent + this.indent;
-		if(doSort)
+		if (doSort)
 			map = convToSortedMap(map);
 		for (Map.Entry<?, ?> e : map.entrySet()) {
 			sb.append(CRLF).append(subIndent);
@@ -598,19 +598,21 @@ public class ObjDumper4j {
 		sb.append(CRLF).append(indent).append("}");
 	}
 
+	@SuppressWarnings("unchecked")
 	private SortedMap<?, ?> convToSortedMap(Map<?, ?> map) {
 		if (map instanceof SortedMap)
 			return (SortedMap<?, ?>) map;
 		SortedMap<Object, Object> sortedMap = new TreeMap<Object, Object>(
 				new Comparator<Object>() {
 
-					@SuppressWarnings({ "unchecked", "rawtypes" })
 					@Override
 					public int compare(Object src, Object dst) {
-						if (src.getClass() == dst.getClass()
-								&& src instanceof Comparable)
-							return ((Comparable) src).compareTo(dst);
 						if (src instanceof Number && dst instanceof Number)
+							return ((Comparable) src).compareTo(dst);
+						int res;
+						if(0 != (res = src.getClass().getName().compareTo(dst.getClass().getName())))
+							return res;
+						if(src instanceof Comparable && src.getClass() == dst.getClass())
 							return ((Comparable) src).compareTo(dst);
 						return String.valueOf(src).compareTo(
 								String.valueOf(dst));
@@ -652,8 +654,8 @@ public class ObjDumper4j {
 			for (Field f : clazz.getDeclaredFields()) {
 				if (!this.isStaticShow && Modifier.isStatic(f.getModifiers()))
 					continue;
-				sb.append(CRLF).append(subIndent).append(f.getName())
-						.append(" = ");
+				sb.append(CRLF).append(subIndent).append(f.getName()).append(
+						" = ");
 				if (readyForAccess(f, f.getModifiers()))
 					dumpObj(f.get(obj), subIndent);
 				isFieldAdded = true;
@@ -661,8 +663,8 @@ public class ObjDumper4j {
 
 			clazz = clazz.getSuperclass();
 			if (clazz != null && clazz != Object.class)
-				sb.append(CRLF).append(subIndent).append("[")
-						.append(clazz.getName()).append("]");
+				sb.append(CRLF).append(subIndent).append("[").append(
+						clazz.getName()).append("]");
 			else
 				break;
 		}
@@ -687,8 +689,8 @@ public class ObjDumper4j {
 		boolean isFieldAdded = false;
 		for (Entry<String, List<Field>> e : fmap.entrySet()) {
 			for (Field f : e.getValue()) {
-				sb.append(CRLF).append(subIndent).append(f.getName())
-						.append(" = ");
+				sb.append(CRLF).append(subIndent).append(f.getName()).append(
+						" = ");
 				if (readyForAccess(f, f.getModifiers()))
 					dumpObj(f.get(obj), subIndent);
 				isFieldAdded = true;
