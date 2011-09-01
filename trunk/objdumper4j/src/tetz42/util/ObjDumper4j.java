@@ -27,14 +27,18 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -124,8 +128,8 @@ public class ObjDumper4j {
 			prop.load(ObjDumper4j.class
 					.getResourceAsStream("ObjDumper4j.properties"));
 			for (Map.Entry<Object, Object> entry : prop.entrySet())
-				map.put(String.valueOf(entry.getKey()), String.valueOf(
-						entry.getValue()).trim());
+				map.put(String.valueOf(entry.getKey()),
+						String.valueOf(entry.getValue()).trim());
 		} catch (Throwable e) {
 		}
 		primitiveMap = Collections.unmodifiableMap(map);
@@ -285,6 +289,7 @@ public class ObjDumper4j {
 	private String indent = "\t";
 	protected String initIndent = "";
 	private boolean isStaticShow = false;
+	private boolean doSort = false;
 
 	/**
 	 * Changes the algorithm to most safe type.
@@ -443,6 +448,11 @@ public class ObjDumper4j {
 		return this;
 	}
 
+	public ObjDumper4j doSort() {
+		this.doSort = true;
+		return this;
+	}
+
 	protected ObjDumper4j(Object... objs) {
 		this.objs = objs;
 	}
@@ -577,6 +587,8 @@ public class ObjDumper4j {
 			return;
 		}
 		String subIndent = indent + this.indent;
+		if(doSort)
+			map = convToSortedMap(map);
 		for (Map.Entry<?, ?> e : map.entrySet()) {
 			sb.append(CRLF).append(subIndent);
 			dumpObj(e.getKey(), subIndent);
@@ -586,6 +598,28 @@ public class ObjDumper4j {
 		sb.append(CRLF).append(indent).append("}");
 	}
 
+	private SortedMap<?, ?> convToSortedMap(Map<?, ?> map) {
+		if (map instanceof SortedMap)
+			return (SortedMap<?, ?>) map;
+		SortedMap<Object, Object> sortedMap = new TreeMap<Object, Object>(
+				new Comparator<Object>() {
+
+					@SuppressWarnings({ "unchecked", "rawtypes" })
+					@Override
+					public int compare(Object src, Object dst) {
+						if (src.getClass() == dst.getClass()
+								&& src instanceof Comparable)
+							return ((Comparable) src).compareTo(dst);
+						if (src instanceof Number && dst instanceof Number)
+							return ((Comparable) src).compareTo(dst);
+						return String.valueOf(src).compareTo(
+								String.valueOf(dst));
+					}
+				});
+		sortedMap.putAll(map);
+		return sortedMap;
+	}
+
 	protected void dumpBean(Object obj, String indent) {
 		sb.append(m.genId(obj)).append("{");
 		if (!m.mark(obj)) {
@@ -593,29 +627,13 @@ public class ObjDumper4j {
 			return;
 		}
 		try {
-			boolean isFieldAdded = false;
 			int startTimeLength = sb.length();
-			Class<? extends Object> clazz = obj.getClass();
-			String subIndent = indent + this.indent;
-			while (true) {
-				for (Field f : clazz.getDeclaredFields()) {
-					if (!this.isStaticShow
-							&& Modifier.isStatic(f.getModifiers()))
-						continue;
-					sb.append(CRLF).append(subIndent).append(f.getName())
-							.append(" = ");
-					if (readyForAccess(f, f.getModifiers()))
-						dumpObj(f.get(obj), subIndent);
-					isFieldAdded = true;
-				}
+			boolean isFieldAdded;
+			if (this.doSort)
+				isFieldAdded = appendSortedBean(obj, indent);
+			else
+				isFieldAdded = appendBean(obj, indent);
 
-				clazz = clazz.getSuperclass();
-				if (clazz != null && clazz != Object.class)
-					sb.append(CRLF).append(subIndent).append("[").append(
-							clazz.getName()).append("]");
-				else
-					break;
-			}
 			if (isFieldAdded)
 				sb.append(CRLF).append(indent).append("}");
 			else
@@ -623,6 +641,67 @@ public class ObjDumper4j {
 		} catch (Throwable t) {
 			dumpThrowable(t);
 		}
+	}
+
+	private boolean appendBean(Object obj, String indent)
+			throws IllegalArgumentException, IllegalAccessException {
+		boolean isFieldAdded = false;
+		Class<? extends Object> clazz = obj.getClass();
+		String subIndent = indent + this.indent;
+		while (true) {
+			for (Field f : clazz.getDeclaredFields()) {
+				if (!this.isStaticShow && Modifier.isStatic(f.getModifiers()))
+					continue;
+				sb.append(CRLF).append(subIndent).append(f.getName())
+						.append(" = ");
+				if (readyForAccess(f, f.getModifiers()))
+					dumpObj(f.get(obj), subIndent);
+				isFieldAdded = true;
+			}
+
+			clazz = clazz.getSuperclass();
+			if (clazz != null && clazz != Object.class)
+				sb.append(CRLF).append(subIndent).append("[")
+						.append(clazz.getName()).append("]");
+			else
+				break;
+		}
+		return isFieldAdded;
+	}
+
+	private boolean appendSortedBean(Object obj, String indent)
+			throws IllegalArgumentException, IllegalAccessException {
+		Class<? extends Object> clazz = obj.getClass();
+		String subIndent = indent + this.indent;
+		TreeMap<String, List<Field>> fmap = new TreeMap<String, List<Field>>();
+		while (true) {
+			for (Field f : clazz.getDeclaredFields()) {
+				if (!this.isStaticShow && Modifier.isStatic(f.getModifiers()))
+					continue;
+				appendField(fmap, f);
+			}
+			clazz = clazz.getSuperclass();
+			if (clazz == null || clazz == Object.class)
+				break;
+		}
+		boolean isFieldAdded = false;
+		for (Entry<String, List<Field>> e : fmap.entrySet()) {
+			for (Field f : e.getValue()) {
+				sb.append(CRLF).append(subIndent).append(f.getName())
+						.append(" = ");
+				if (readyForAccess(f, f.getModifiers()))
+					dumpObj(f.get(obj), subIndent);
+				isFieldAdded = true;
+			}
+		}
+		return isFieldAdded;
+	}
+
+	private void appendField(TreeMap<String, List<Field>> fmap, Field f) {
+		List<Field> list = fmap.get(f.getName());
+		if (list == null)
+			fmap.put(f.getName(), list = new ArrayList<Field>());
+		list.add(f);
 	}
 
 	protected void dumpThrowable(Throwable obj) {
