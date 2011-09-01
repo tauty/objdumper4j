@@ -34,7 +34,7 @@ public class ObjDumper4jTest2 {
 				.println("--------------------------------------------------");
 
 		final SampleBean bean = new SampleBean();
-		
+
 		System.out.println(dumper(bean).initIndent("    "));
 
 		@SuppressWarnings("serial")
@@ -52,7 +52,7 @@ public class ObjDumper4jTest2 {
 				.initIndent("\t\t").delimiter("\n\n"));
 
 	}
-	
+
 	@Test
 	public void showStatic() {
 		System.out
@@ -69,6 +69,13 @@ public class ObjDumper4jTest2 {
 		System.out.println(dumper(bean).indent("   "));
 		System.out.println(dumper(bean).indent("=="));
 		System.out.println(dumper(bean).indent("==").initIndent("****"));
+	}
+
+	@Test
+	public void doSort() {
+		System.out.println(dumper("--- Not Sorted ---\n", new SampleBean()));
+		System.out.println(dumper("---   sorted   ---\n", new SampleBean())
+				.doSort());
 	}
 
 	@SuppressWarnings("unused")
@@ -88,11 +95,22 @@ public class ObjDumper4jTest2 {
 		@SuppressWarnings("serial")
 		public Map<String, String> strMap = new HashMap<String, String>() {
 			{
+				put("e", "2");
 				put("a", "1");
 				put("b", "2");
 			}
 		};
 		private String[] emptyAry = new String[0];
+		@SuppressWarnings("serial")
+		public Map<Object, Object> objMap = new HashMap<Object, Object>() {
+			{
+				put(100, 20);
+				put(99, 2);
+				put("9", 999999999);
+				put("0", 0);
+				put("3", 999);
+			}
+		};
 		private List<String> emptyList = new ArrayList<String>();
 		private Map<String, String> emptyMap = new HashMap<String, String>();
 		private double aaa = 10.5;
