@@ -605,6 +605,7 @@ public class ObjDumper4j {
 		SortedMap<Object, Object> sortedMap = new TreeMap<Object, Object>(
 				new Comparator<Object>() {
 
+					@SuppressWarnings("rawtypes")
 					@Override
 					public int compare(Object src, Object dst) {
 						if (src instanceof Number && dst instanceof Number)
