@@ -497,9 +497,9 @@ public class ObjDumper4j {
 		else if (obj instanceof CharSequence)
 			sb.append("\"").append((CharSequence) obj).append("\"");
 		else if (primitiveMap.containsKey(obj.getClass().getName()))
-			dumpPrimitive(obj, indent);
+			dumpPrimitive(obj);
 		else if (obj instanceof Date)
-			dumpDate((Date) obj, indent);
+			dumpDate((Date) obj);
 		else if (obj.getClass().isEnum())
 			sb.append("" + obj);
 		else if (obj.getClass().isArray())
@@ -516,14 +516,14 @@ public class ObjDumper4j {
 
 	private SimpleDateFormat sdformat;
 
-	private void dumpDate(Date date, String indent) {
+	private void dumpDate(Date date) {
 		if (sdformat == null)
 			sdformat = new SimpleDateFormat(
 					"EEE, MMM. d, yyyy 'at' HH:mm:ss.SSS", Locale.US);
 		sb.append(sdformat.format(date));
 	}
 
-	protected void dumpPrimitive(Object obj, String indent) {
+	protected void dumpPrimitive(Object obj) {
 		String methodName = primitiveMap.get(obj.getClass().getName());
 		if (methodName != null && methodName.length() != 0) {
 			try {
@@ -605,7 +605,6 @@ public class ObjDumper4j {
 		SortedMap<Object, Object> sortedMap = new TreeMap<Object, Object>(
 				new Comparator<Object>() {
 
-					@SuppressWarnings("rawtypes")
 					@Override
 					public int compare(Object src, Object dst) {
 						if (src instanceof Number && dst instanceof Number)
