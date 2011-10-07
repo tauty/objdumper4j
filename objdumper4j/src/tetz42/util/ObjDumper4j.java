@@ -46,14 +46,14 @@ import java.util.concurrent.atomic.AtomicLong;
  * Dumps or inspects any objects and converts to readable format string. This
  * library consists of one file only.
  * <p>
- * 
+ *
  * [sample]<br>
  * &emsp;&emsp; import static tetz42.util.ObjDumper4j.*;<br>
  * &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; :<br>
  * &emsp;&emsp;&emsp;&emsp; Logger.debug( dumper("The result object:\n",
  * theResult) );<br>
  * &emsp;&emsp;&emsp;&emsp; Logger.debug( inspecter("foo") );<br>
- * 
+ *
  * <p>
  * You can choose five algorithms against reference cycles.<br>
  * - superRapid<br>
@@ -80,7 +80,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * parameter is a List, Set or Map that has a reference to itself.<br>
  * &emsp;&emsp;&emsp;&emsp; Logger.debug( dumper(list).superSafe() );<br>
  * <br>
- * 
+ *
  * @version 1.2.0
  * @author tetz
  */
@@ -96,14 +96,14 @@ public class ObjDumper4j {
 	 * - change the method performed<br>
 	 * map.put( Integer.class.getName(), "floatValue" );<br>
 	 * // note: By default, 'toString' method is performed.<br>
-	 * 
+	 *
 	 * <p>
 	 * Furthermore, you can also change primitive types by putting a property
 	 * file. You must name the file 'ObjDumper4j.properties', and the contents
 	 * must be as follows:<br/>
 	 * java.util.HashMap=<br/>
 	 * java.lang.Integer=floatValue<br/>
-	 * 
+	 *
 	 */
 	protected static final Map<String, String> primitiveMap;
 	static {
@@ -140,7 +140,7 @@ public class ObjDumper4j {
 
 	/**
 	 * dump method.
-	 * 
+	 *
 	 * @see ObjDumper4j#dumper
 	 * @param objs
 	 *            - objects to dump
@@ -152,7 +152,7 @@ public class ObjDumper4j {
 
 	/**
 	 * Creates an object to dump the parameters.
-	 * 
+	 *
 	 * <p>
 	 * When 'toString' method of the object is called, the parameters will dump
 	 * as follows:<br>
@@ -192,7 +192,7 @@ public class ObjDumper4j {
 	 * &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; "baz"<br>
 	 * &emsp;&emsp;&emsp;&emsp; ]<br>
 	 * &emsp;&emsp; }<br>
-	 * 
+	 *
 	 * <p>
 	 * You can use this method as follows:<br>
 	 * &emsp;&emsp;Logger.debug( dumper("Contents of DTO = ", dto) );<br>
@@ -208,7 +208,7 @@ public class ObjDumper4j {
 	 * &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; "Farther"<br>
 	 * &emsp;&emsp;&emsp;&emsp; ]<br>
 	 * &emsp;&emsp; }<br>
-	 * 
+	 *
 	 * <p>
 	 * The object returned does not do anything unless its 'toString' method is
 	 * performed.<br>
@@ -221,7 +221,7 @@ public class ObjDumper4j {
 	 * &emsp;&emsp; }<br>
 	 * Because log4j does not perform 'toString' method unless the log is
 	 * output.<br>
-	 * 
+	 *
 	 * @param objs
 	 *            - objects to dump
 	 * @return the object to dump parameters
@@ -232,7 +232,7 @@ public class ObjDumper4j {
 
 	/**
 	 * inspect method.
-	 * 
+	 *
 	 * @see ObjDumper4j#inspecter
 	 * @param objs
 	 *            - objects to inspect
@@ -244,7 +244,7 @@ public class ObjDumper4j {
 
 	/**
 	 * Returns the object to inspect parameters.
-	 * 
+	 *
 	 * <p>
 	 * [sample]<br>
 	 * &emsp;&emsp;System.out.println( inspecter("foo") );<br>
@@ -267,7 +267,7 @@ public class ObjDumper4j {
 	 * 8575799808933029326<br>
 	 * &emsp;&emsp;&emsp;&emsp; }<br>
 	 * &emsp;&emsp; }<br>
-	 * 
+	 *
 	 * @param objs
 	 *            - objects to inspect
 	 * @return the object to inspect parameters
@@ -298,7 +298,7 @@ public class ObjDumper4j {
 	 * <p>
 	 * [sample]<br>
 	 * &emsp;&emsp; Logger.debug( dumper(dto).superSafe() );<br>
-	 * 
+	 *
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j superSafe() {
@@ -319,7 +319,7 @@ public class ObjDumper4j {
 	 * &emsp;&emsp; Logger.debug( dumper(dto).safe() );<br>
 	 * <br>
 	 * By default, this type is selected.<br>
-	 * 
+	 *
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j safe() {
@@ -332,7 +332,7 @@ public class ObjDumper4j {
 	 * <p>
 	 * [sample]<br>
 	 * &emsp;&emsp; Logger.debug( dumper(dto).normal() );<br>
-	 * 
+	 *
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j normal() {
@@ -352,7 +352,7 @@ public class ObjDumper4j {
 	 * <p>
 	 * [sample]<br>
 	 * &emsp;&emsp; Logger.debug( dumper(dto).rapid() );<br>
-	 * 
+	 *
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j rapid() {
@@ -372,7 +372,7 @@ public class ObjDumper4j {
 	 * <p>
 	 * [sample]<br>
 	 * &emsp;&emsp; Logger.debug( dumper(dto).superRapid() );<br>
-	 * 
+	 *
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j superRapid() {
@@ -407,7 +407,7 @@ public class ObjDumper4j {
 	 * &emsp;&emsp;&emsp;&emsp; id = 79<br>
 	 * &emsp;&emsp;&emsp;&emsp; name = "Bar"<br>
 	 * &emsp;&emsp; }<br>
-	 * 
+	 *
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j delimiter(String delimiter) {
@@ -417,7 +417,7 @@ public class ObjDumper4j {
 
 	/**
 	 * Show static fields of dumped object.<br>
-	 * 
+	 *
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j showStatic() {
@@ -428,7 +428,7 @@ public class ObjDumper4j {
 	/**
 	 * Change indent literal of dumped string.<br>
 	 * The default value is <TAB>.
-	 * 
+	 *
 	 * @param indent
 	 *            user specific indent.
 	 * @return a reference to this object
@@ -440,7 +440,7 @@ public class ObjDumper4j {
 
 	/**
 	 * Set initial indent of dumped string.<br>
-	 * 
+	 *
 	 * @param indent
 	 *            user specific indent.
 	 * @return a reference to this object
@@ -649,14 +649,14 @@ public class ObjDumper4j {
 			FieldTokenizer tokenizer = new FieldTokenizer(obj.getClass());
 			while (true) {
 				for (Field f : tokenizer.getFields()) {
-					sb.append(CRLF).append(subIndent).append(f.getName()).append(
-							" = ");
+					sb.append(CRLF).append(subIndent).append(f.getName())
+							.append(" = ");
 					if (readyForAccess(f, f.getModifiers()))
 						dumpObj(f.get(obj), subIndent);
 					isFieldAdded = true;
 				}
 				String nextClassName = tokenizer.getClassName();
-				if(nextClassName != null)
+				if (nextClassName != null)
 					sb.append(CRLF).append(subIndent).append("[").append(
 							nextClassName).append("]");
 				else
@@ -769,8 +769,8 @@ public class ObjDumper4j {
 					@Override
 					public int compare(Field f1, Field f2) {
 						if (isPrimitiveFirst) {
-							int i1 = isPrimitive(f1) ? 1 : 0;
-							int i2 = isPrimitive(f2) ? 1 : 0;
+							int i1 = isPrimitive(f1) ? 0 : 1;
+							int i2 = isPrimitive(f2) ? 0 : 1;
 							int i = i1 - i2;
 							if (i != 0)
 								return i;
@@ -784,7 +784,11 @@ public class ObjDumper4j {
 					private boolean isPrimitive(Field f) {
 						return f.getType().isPrimitive()
 								|| primitiveMap.containsKey(f.getType()
-										.getName());
+										.getName())
+								|| CharSequence.class.isAssignableFrom(f
+										.getType())
+								|| Date.class.isAssignableFrom(f.getType())
+								|| f.getType().isEnum();
 					}
 				});
 			}
