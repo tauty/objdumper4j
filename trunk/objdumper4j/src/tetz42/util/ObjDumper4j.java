@@ -290,6 +290,8 @@ public class ObjDumper4j {
 	protected String initIndent = "";
 	private boolean isStaticShow = false;
 	private boolean doSort = false;
+	private boolean isPrimitiveFirst = false;
+	private boolean isClassFlatten = false;
 
 	/**
 	 * Changes the algorithm to most safe type.
@@ -453,6 +455,16 @@ public class ObjDumper4j {
 		return this;
 	}
 
+	public ObjDumper4j primitiveFirst() {
+		this.isPrimitiveFirst = true;
+		return this;
+	}
+
+	public ObjDumper4j classFlatten() {
+		this.isClassFlatten = true;
+		return this;
+	}
+
 	protected ObjDumper4j(Object... objs) {
 		this.objs = objs;
 	}
@@ -610,9 +622,11 @@ public class ObjDumper4j {
 						if (src instanceof Number && dst instanceof Number)
 							return ((Comparable) src).compareTo(dst);
 						int res;
-						if(0 != (res = src.getClass().getName().compareTo(dst.getClass().getName())))
+						if (0 != (res = src.getClass().getName().compareTo(
+								dst.getClass().getName())))
 							return res;
-						if(src instanceof Comparable && src.getClass() == dst.getClass())
+						if (src instanceof Comparable
+								&& src.getClass() == dst.getClass())
 							return ((Comparable) src).compareTo(dst);
 						return String.valueOf(src).compareTo(
 								String.valueOf(dst));
@@ -630,11 +644,24 @@ public class ObjDumper4j {
 		}
 		try {
 			int startTimeLength = sb.length();
-			boolean isFieldAdded;
-			if (this.doSort)
-				isFieldAdded = appendSortedBean(obj, indent);
-			else
-				isFieldAdded = appendBean(obj, indent);
+			boolean isFieldAdded = false;
+			String subIndent = indent + this.indent;
+			FieldTokenizer tokenizer = new FieldTokenizer(obj.getClass());
+			while (true) {
+				for (Field f : tokenizer.getFields()) {
+					sb.append(CRLF).append(subIndent).append(f.getName()).append(
+							" = ");
+					if (readyForAccess(f, f.getModifiers()))
+						dumpObj(f.get(obj), subIndent);
+					isFieldAdded = true;
+				}
+				String nextClassName = tokenizer.getClassName();
+				if(nextClassName != null)
+					sb.append(CRLF).append(subIndent).append("[").append(
+							nextClassName).append("]");
+				else
+					break;
+			}
 
 			if (isFieldAdded)
 				sb.append(CRLF).append(indent).append("}");
@@ -643,67 +670,6 @@ public class ObjDumper4j {
 		} catch (Throwable t) {
 			dumpThrowable(t);
 		}
-	}
-
-	private boolean appendBean(Object obj, String indent)
-			throws IllegalArgumentException, IllegalAccessException {
-		boolean isFieldAdded = false;
-		Class<? extends Object> clazz = obj.getClass();
-		String subIndent = indent + this.indent;
-		while (true) {
-			for (Field f : clazz.getDeclaredFields()) {
-				if (!this.isStaticShow && Modifier.isStatic(f.getModifiers()))
-					continue;
-				sb.append(CRLF).append(subIndent).append(f.getName()).append(
-						" = ");
-				if (readyForAccess(f, f.getModifiers()))
-					dumpObj(f.get(obj), subIndent);
-				isFieldAdded = true;
-			}
-
-			clazz = clazz.getSuperclass();
-			if (clazz != null && clazz != Object.class)
-				sb.append(CRLF).append(subIndent).append("[").append(
-						clazz.getName()).append("]");
-			else
-				break;
-		}
-		return isFieldAdded;
-	}
-
-	private boolean appendSortedBean(Object obj, String indent)
-			throws IllegalArgumentException, IllegalAccessException {
-		Class<? extends Object> clazz = obj.getClass();
-		String subIndent = indent + this.indent;
-		TreeMap<String, List<Field>> fmap = new TreeMap<String, List<Field>>();
-		while (true) {
-			for (Field f : clazz.getDeclaredFields()) {
-				if (!this.isStaticShow && Modifier.isStatic(f.getModifiers()))
-					continue;
-				appendField(fmap, f);
-			}
-			clazz = clazz.getSuperclass();
-			if (clazz == null || clazz == Object.class)
-				break;
-		}
-		boolean isFieldAdded = false;
-		for (Entry<String, List<Field>> e : fmap.entrySet()) {
-			for (Field f : e.getValue()) {
-				sb.append(CRLF).append(subIndent).append(f.getName()).append(
-						" = ");
-				if (readyForAccess(f, f.getModifiers()))
-					dumpObj(f.get(obj), subIndent);
-				isFieldAdded = true;
-			}
-		}
-		return isFieldAdded;
-	}
-
-	private void appendField(TreeMap<String, List<Field>> fmap, Field f) {
-		List<Field> list = fmap.get(f.getName());
-		if (list == null)
-			fmap.put(f.getName(), list = new ArrayList<Field>());
-		list.add(f);
 	}
 
 	protected void dumpThrowable(Throwable obj) {
@@ -776,6 +742,69 @@ public class ObjDumper4j {
 		@Override
 		public int hashCode() {
 			return hash;
+		}
+	}
+
+	private class FieldTokenizer {
+
+		private final Class<?> initClazz;
+		private Class<?> clazz;
+
+		FieldTokenizer(Class<?> clazz) {
+			this.initClazz = clazz;
+			this.clazz = this.initClazz;
+		}
+
+		String getClassName() {
+			if (clazz == null || clazz == Object.class)
+				return null;
+			return clazz.getName();
+		}
+
+		List<Field> getFields() {
+			List<Field> list = getFields(new ArrayList<Field>());
+			if (isPrimitiveFirst || doSort) {
+				Collections.sort(list, new Comparator<Field>() {
+
+					@Override
+					public int compare(Field f1, Field f2) {
+						if (isPrimitiveFirst) {
+							int i1 = isPrimitive(f1) ? 1 : 0;
+							int i2 = isPrimitive(f2) ? 1 : 0;
+							int i = i1 - i2;
+							if (i != 0)
+								return i;
+						}
+						if (doSort) {
+							return f1.getName().compareTo(f2.getName());
+						}
+						return 0;
+					}
+
+					private boolean isPrimitive(Field f) {
+						return f.getType().isPrimitive()
+								|| primitiveMap.containsKey(f.getType()
+										.getName());
+					}
+				});
+			}
+			return list;
+		}
+
+		private List<Field> getFields(List<Field> list) {
+			if (clazz == null || clazz == Object.class)
+				return list;
+			for (Field f : clazz.getDeclaredFields()) {
+				if (!isStaticShow && Modifier.isStatic(f.getModifiers()))
+					continue;
+				list.add(f);
+			}
+			clazz = clazz.getSuperclass();
+			return !isClassFlatten ? list : getFields(list);
+		}
+
+		void reset() {
+			clazz = initClazz;
 		}
 	}
 

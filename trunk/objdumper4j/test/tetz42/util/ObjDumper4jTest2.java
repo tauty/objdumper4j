@@ -76,6 +76,9 @@ public class ObjDumper4jTest2 {
 		System.out.println(dumper("--- Not Sorted ---\n", new SampleBean()));
 		System.out.println(dumper("---   sorted   ---\n", new SampleBean())
 				.doSort());
+		// TODO do not work well. check the implimentation.
+		System.out.println(dumper("---   primitiveFirst   ---\n", new SampleBean())
+				.primitiveFirst());
 	}
 
 	@SuppressWarnings("unused")
