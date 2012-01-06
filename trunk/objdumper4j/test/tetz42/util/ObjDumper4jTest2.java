@@ -73,13 +73,20 @@ public class ObjDumper4jTest2 {
 
 	@Test
 	public void doSort() {
-		System.out.println(dumper("--- Not Sorted ---\n", new SampleBean()));
-		System.out.println(dumper("---   sorted   ---\n", new SampleBean())
+		System.out.println(dumper("--- Not Sorted ---\n", new SubBean()));
+		System.out.println(dumper("---   sorted   ---\n", new SubBean())
 				.doSort());
-		System.out.println(dumper("---   primitiveFirst   ---\n",
-				new SampleBean()).primitiveFirst());
+		System.out
+				.println(dumper("---   primitiveFirst   ---\n", new SubBean())
+						.primitiveFirst());
 		System.out.println(dumper("---   primitiveFirst & doSort   ---\n",
-				new SampleBean()).primitiveFirst().doSort());
+				new SubBean()).primitiveFirst().doSort());
+		System.out.println(dumper("---   classFlatten   ---\n",
+				new SubBean()).classFlatten());
+		System.out.println(dumper("---   classFlatten & primitiveFirst   ---\n",
+				new SubBean()).primitiveFirst().classFlatten());
+		System.out.println(dumper("---   classFlatten & primitiveFirst & doSort   ---\n",
+				new SubBean()).primitiveFirst().doSort().classFlatten());
 	}
 
 	@SuppressWarnings("unused")
@@ -108,11 +115,14 @@ public class ObjDumper4jTest2 {
 		@SuppressWarnings("serial")
 		public Map<Object, Object> objMap = new HashMap<Object, Object>() {
 			{
-				put(100, 20);
+				put(100, null);
 				put(99, 2);
+				put(1, new String[] { "100", "200", "300" });
 				put("9", 999999999);
 				put("0", 0);
 				put("3", 999);
+				put(null, 600);
+				put(0, new int[] { 3, 4, 5 });
 			}
 		};
 		private List<String> emptyList = new ArrayList<String>();
