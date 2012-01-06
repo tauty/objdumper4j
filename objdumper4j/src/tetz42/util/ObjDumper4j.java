@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
@@ -46,14 +45,14 @@ import java.util.concurrent.atomic.AtomicLong;
  * Dumps or inspects any objects and converts to readable format string. This
  * library consists of one file only.
  * <p>
- *
+ * 
  * [sample]<br>
  * &emsp;&emsp; import static tetz42.util.ObjDumper4j.*;<br>
  * &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; :<br>
  * &emsp;&emsp;&emsp;&emsp; Logger.debug( dumper("The result object:\n",
  * theResult) );<br>
  * &emsp;&emsp;&emsp;&emsp; Logger.debug( inspecter("foo") );<br>
- *
+ * 
  * <p>
  * You can choose five algorithms against reference cycles.<br>
  * - superRapid<br>
@@ -80,7 +79,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * parameter is a List, Set or Map that has a reference to itself.<br>
  * &emsp;&emsp;&emsp;&emsp; Logger.debug( dumper(list).superSafe() );<br>
  * <br>
- *
+ * 
  * @version 1.2.0
  * @author tetz
  */
@@ -96,14 +95,14 @@ public class ObjDumper4j {
 	 * - change the method performed<br>
 	 * map.put( Integer.class.getName(), "floatValue" );<br>
 	 * // note: By default, 'toString' method is performed.<br>
-	 *
+	 * 
 	 * <p>
 	 * Furthermore, you can also change primitive types by putting a property
 	 * file. You must name the file 'ObjDumper4j.properties', and the contents
 	 * must be as follows:<br/>
 	 * java.util.HashMap=<br/>
 	 * java.lang.Integer=floatValue<br/>
-	 *
+	 * 
 	 */
 	protected static final Map<String, String> primitiveMap;
 	static {
@@ -128,8 +127,8 @@ public class ObjDumper4j {
 			prop.load(ObjDumper4j.class
 					.getResourceAsStream("ObjDumper4j.properties"));
 			for (Map.Entry<Object, Object> entry : prop.entrySet())
-				map.put(String.valueOf(entry.getKey()), String.valueOf(
-						entry.getValue()).trim());
+				map.put(String.valueOf(entry.getKey()),
+						String.valueOf(entry.getValue()).trim());
 		} catch (Throwable e) {
 		}
 		primitiveMap = Collections.unmodifiableMap(map);
@@ -140,7 +139,7 @@ public class ObjDumper4j {
 
 	/**
 	 * dump method.
-	 *
+	 * 
 	 * @see ObjDumper4j#dumper
 	 * @param objs
 	 *            - objects to dump
@@ -152,7 +151,7 @@ public class ObjDumper4j {
 
 	/**
 	 * Creates an object to dump the parameters.
-	 *
+	 * 
 	 * <p>
 	 * When 'toString' method of the object is called, the parameters will dump
 	 * as follows:<br>
@@ -192,7 +191,7 @@ public class ObjDumper4j {
 	 * &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; "baz"<br>
 	 * &emsp;&emsp;&emsp;&emsp; ]<br>
 	 * &emsp;&emsp; }<br>
-	 *
+	 * 
 	 * <p>
 	 * You can use this method as follows:<br>
 	 * &emsp;&emsp;Logger.debug( dumper("Contents of DTO = ", dto) );<br>
@@ -208,7 +207,7 @@ public class ObjDumper4j {
 	 * &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; "Farther"<br>
 	 * &emsp;&emsp;&emsp;&emsp; ]<br>
 	 * &emsp;&emsp; }<br>
-	 *
+	 * 
 	 * <p>
 	 * The object returned does not do anything unless its 'toString' method is
 	 * performed.<br>
@@ -221,7 +220,7 @@ public class ObjDumper4j {
 	 * &emsp;&emsp; }<br>
 	 * Because log4j does not perform 'toString' method unless the log is
 	 * output.<br>
-	 *
+	 * 
 	 * @param objs
 	 *            - objects to dump
 	 * @return the object to dump parameters
@@ -232,7 +231,7 @@ public class ObjDumper4j {
 
 	/**
 	 * inspect method.
-	 *
+	 * 
 	 * @see ObjDumper4j#inspecter
 	 * @param objs
 	 *            - objects to inspect
@@ -244,7 +243,7 @@ public class ObjDumper4j {
 
 	/**
 	 * Returns the object to inspect parameters.
-	 *
+	 * 
 	 * <p>
 	 * [sample]<br>
 	 * &emsp;&emsp;System.out.println( inspecter("foo") );<br>
@@ -267,7 +266,7 @@ public class ObjDumper4j {
 	 * 8575799808933029326<br>
 	 * &emsp;&emsp;&emsp;&emsp; }<br>
 	 * &emsp;&emsp; }<br>
-	 *
+	 * 
 	 * @param objs
 	 *            - objects to inspect
 	 * @return the object to inspect parameters
@@ -298,7 +297,7 @@ public class ObjDumper4j {
 	 * <p>
 	 * [sample]<br>
 	 * &emsp;&emsp; Logger.debug( dumper(dto).superSafe() );<br>
-	 *
+	 * 
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j superSafe() {
@@ -319,7 +318,7 @@ public class ObjDumper4j {
 	 * &emsp;&emsp; Logger.debug( dumper(dto).safe() );<br>
 	 * <br>
 	 * By default, this type is selected.<br>
-	 *
+	 * 
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j safe() {
@@ -332,7 +331,7 @@ public class ObjDumper4j {
 	 * <p>
 	 * [sample]<br>
 	 * &emsp;&emsp; Logger.debug( dumper(dto).normal() );<br>
-	 *
+	 * 
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j normal() {
@@ -352,7 +351,7 @@ public class ObjDumper4j {
 	 * <p>
 	 * [sample]<br>
 	 * &emsp;&emsp; Logger.debug( dumper(dto).rapid() );<br>
-	 *
+	 * 
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j rapid() {
@@ -372,7 +371,7 @@ public class ObjDumper4j {
 	 * <p>
 	 * [sample]<br>
 	 * &emsp;&emsp; Logger.debug( dumper(dto).superRapid() );<br>
-	 *
+	 * 
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j superRapid() {
@@ -407,7 +406,7 @@ public class ObjDumper4j {
 	 * &emsp;&emsp;&emsp;&emsp; id = 79<br>
 	 * &emsp;&emsp;&emsp;&emsp; name = "Bar"<br>
 	 * &emsp;&emsp; }<br>
-	 *
+	 * 
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j delimiter(String delimiter) {
@@ -417,7 +416,7 @@ public class ObjDumper4j {
 
 	/**
 	 * Show static fields of dumped object.<br>
-	 *
+	 * 
 	 * @return a reference to this object
 	 */
 	public ObjDumper4j showStatic() {
@@ -428,7 +427,7 @@ public class ObjDumper4j {
 	/**
 	 * Change indent literal of dumped string.<br>
 	 * The default value is <TAB>.
-	 *
+	 * 
 	 * @param indent
 	 *            user specific indent.
 	 * @return a reference to this object
@@ -440,7 +439,7 @@ public class ObjDumper4j {
 
 	/**
 	 * Set initial indent of dumped string.<br>
-	 *
+	 * 
 	 * @param indent
 	 *            user specific indent.
 	 * @return a reference to this object
@@ -599,7 +598,7 @@ public class ObjDumper4j {
 			return;
 		}
 		String subIndent = indent + this.indent;
-		if (doSort)
+		if (doSort || isPrimitiveFirst)
 			map = convToSortedMap(map);
 		for (Map.Entry<?, ?> e : map.entrySet()) {
 			sb.append(CRLF).append(subIndent);
@@ -611,19 +610,42 @@ public class ObjDumper4j {
 	}
 
 	@SuppressWarnings("unchecked")
-	private SortedMap<?, ?> convToSortedMap(Map<?, ?> map) {
-		if (map instanceof SortedMap)
-			return (SortedMap<?, ?>) map;
+	private SortedMap<?, ?> convToSortedMap(final Map<?, ?> map) {
 		SortedMap<Object, Object> sortedMap = new TreeMap<Object, Object>(
 				new Comparator<Object>() {
 
 					@Override
 					public int compare(Object src, Object dst) {
+						if (isPrimitiveFirst) {
+							int i = forPrimitiveFirst(src, dst);
+							if (i != 0)
+								return i;
+						}
+						return forDoSort(src, dst);
+					}
+
+					private int forPrimitiveFirst(Object src, Object dst) {
+						int i = compareForPrimitiveFirst(src, dst);
+						if (i == 0)
+							i = compareForPrimitiveFirst(map.get(src),
+									map.get(dst));
+						return i;
+					}
+
+					@SuppressWarnings("rawtypes")
+					private int forDoSort(Object src, Object dst) {
+						if (src == null || dst == null) {
+							if(src != null)
+								return -1;
+							if(dst != null)
+								return 1;
+							return 0;
+						}
 						if (src instanceof Number && dst instanceof Number)
 							return ((Comparable) src).compareTo(dst);
 						int res;
-						if (0 != (res = src.getClass().getName().compareTo(
-								dst.getClass().getName())))
+						if (0 != (res = src.getClass().getName()
+								.compareTo(dst.getClass().getName())))
 							return res;
 						if (src instanceof Comparable
 								&& src.getClass() == dst.getClass())
@@ -657,8 +679,8 @@ public class ObjDumper4j {
 				}
 				String nextClassName = tokenizer.getClassName();
 				if (nextClassName != null)
-					sb.append(CRLF).append(subIndent).append("[").append(
-							nextClassName).append("]");
+					sb.append(CRLF).append(subIndent).append("[")
+							.append(nextClassName).append("]");
 				else
 					break;
 			}
@@ -680,7 +702,7 @@ public class ObjDumper4j {
 		sb.append(sw.toString());
 	}
 
-	protected boolean readyForAccess(AccessibleObject ao, int mod) {
+	private boolean readyForAccess(AccessibleObject ao, int mod) {
 		if (Modifier.isPublic(mod) || ao.isAccessible())
 			return true;
 		try {
@@ -690,6 +712,31 @@ public class ObjDumper4j {
 			dumpThrowable(e);
 			return false;
 		}
+	}
+
+	private int compareForPrimitiveFirst(Object obj1, Object obj2) {
+		Class<?> clazz1, clazz2;
+		if (obj1 == null)
+			clazz1 = int.class;
+		else
+			clazz1 = obj1.getClass();
+		if (obj2 == null)
+			clazz2 = int.class;
+		else
+			clazz2 = obj2.getClass();
+		return compareForPrimitiveFirst(clazz1, clazz2);
+	}
+
+	private int compareForPrimitiveFirst(Class<?> clazz1, Class<?> clazz2) {
+		int i1 = isPrimitive(clazz1) ? 0 : 1;
+		int i2 = isPrimitive(clazz2) ? 0 : 1;
+		return i1 - i2;
+	}
+
+	private boolean isPrimitive(Class<?> clazz) {
+		return clazz.isPrimitive() || primitiveMap.containsKey(clazz.getName())
+				|| CharSequence.class.isAssignableFrom(clazz)
+				|| Date.class.isAssignableFrom(clazz) || clazz.isEnum();
 	}
 
 	private abstract class Markable {
@@ -769,9 +816,8 @@ public class ObjDumper4j {
 					@Override
 					public int compare(Field f1, Field f2) {
 						if (isPrimitiveFirst) {
-							int i1 = isPrimitive(f1) ? 0 : 1;
-							int i2 = isPrimitive(f2) ? 0 : 1;
-							int i = i1 - i2;
+							int i = compareForPrimitiveFirst(f1.getType(),
+									f2.getType());
 							if (i != 0)
 								return i;
 						}
@@ -779,16 +825,6 @@ public class ObjDumper4j {
 							return f1.getName().compareTo(f2.getName());
 						}
 						return 0;
-					}
-
-					private boolean isPrimitive(Field f) {
-						return f.getType().isPrimitive()
-								|| primitiveMap.containsKey(f.getType()
-										.getName())
-								|| CharSequence.class.isAssignableFrom(f
-										.getType())
-								|| Date.class.isAssignableFrom(f.getType())
-								|| f.getType().isEnum();
 					}
 				});
 			}
@@ -805,10 +841,6 @@ public class ObjDumper4j {
 			}
 			clazz = clazz.getSuperclass();
 			return !isClassFlatten ? list : getFields(list);
-		}
-
-		void reset() {
-			clazz = initClazz;
 		}
 	}
 
