@@ -50,17 +50,17 @@ import java.util.Map;
  */
 public class PerformanceMeter {
 
-	public static enum OutputCase {
+	public static enum OutputTiming {
 		ALL, END, SHOW
 	}
 
 	public static final String CRLF = System.getProperty("line.separator");
 
 	private static OutputStream out = null;
-	private static OutputCase oc = null;
+	private static OutputTiming oc = null;
 
 	public void test() {
-		PerformanceMeter.init(System.out, OutputCase.ALL);
+		PerformanceMeter.init(System.out, OutputTiming.ALL);
 
 		PerformanceMeter.start("test");
 		// do process
@@ -73,7 +73,7 @@ public class PerformanceMeter {
 		PerformanceMeter.show();
 	}
 
-	public static void init(OutputStream os, OutputCase o) {
+	public static void init(OutputStream os, OutputTiming o) {
 		out = os;
 		oc = o;
 	}
@@ -103,7 +103,7 @@ public class PerformanceMeter {
 			resultMap.put(key, unit = new Unit());
 		long elapsed = System.nanoTime() - startMap.remove(key);
 		unit.add(elapsed);
-		if (out != null && oc != null && oc != OutputCase.SHOW) {
+		if (out != null && oc != null && oc != OutputTiming.SHOW) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("[Performance meter] ").append(key).append(": ")
 					.append(elapsed).append("[nano secs]");
@@ -119,7 +119,7 @@ public class PerformanceMeter {
 	}
 
 	public static void show() {
-		if (out != null && oc != null && oc != OutputCase.END) {
+		if (out != null && oc != null && oc != OutputTiming.END) {
 			StringBuilder sb = new StringBuilder("[Performance meter] Results:")
 					.append(CRLF);
 			for (Map.Entry<String, Unit> e : resultMap.entrySet()) {
