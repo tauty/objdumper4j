@@ -134,9 +134,6 @@ public class ObjDumper4j {
 		primitiveMap = Collections.unmodifiableMap(map);
 	}
 
-	private static final String CRLF = System.getProperty("line.separator");
-	private static final String CRLFx2 = CRLF + CRLF;
-
 	/**
 	 * dump method.
 	 *
@@ -146,7 +143,8 @@ public class ObjDumper4j {
 	 * @return the string converted from objs.
 	 */
 	public static String dump(Object... objs) {
-		return dumper(objs).delimiter(CRLFx2).toString();
+		String CRLF = System.getProperty("line.separator");
+		return dumper(objs).delimiter(CRLF + CRLF).toString();
 	}
 
 	/**
@@ -238,7 +236,8 @@ public class ObjDumper4j {
 	 * @return the string converted from objs.
 	 */
 	public static String inspect(Object... objs) {
-		return inspecter(objs).delimiter(CRLFx2).toString();
+		String CRLF = System.getProperty("line.separator");
+		return inspecter(objs).delimiter(CRLF + CRLF).toString();
 	}
 
 	/**
@@ -291,6 +290,7 @@ public class ObjDumper4j {
 	private boolean doSort = false;
 	private boolean isPrimitiveFirst = false;
 	private boolean isClassFlatten = false;
+	private String CRLF = System.getProperty("line.separator");
 
 	/**
 	 * Changes the algorithm to most safe type.
@@ -411,6 +411,26 @@ public class ObjDumper4j {
 	 */
 	public ObjDumper4j delimiter(String delimiter) {
 		this.delimiter = delimiter;
+		return this;
+	}
+
+	/**
+	 * Changes the line delimiter to CRLF.
+	 *
+	 * @return a reference to this object
+	 */
+	public ObjDumper4j crlf() {
+		this.CRLF = "\r\n";
+		return this;
+	}
+
+	/**
+	 * Changes the line delimiter to LF.
+	 *
+	 * @return a reference to this object
+	 */
+	public ObjDumper4j lf() {
+		this.CRLF = "\n";
 		return this;
 	}
 
